@@ -4,6 +4,16 @@ import { CelestialBodyComponent } from './three-js/components/celestial-body/cel
 
 const routes: Routes = [
 
+  {
+    path: '',
+    redirectTo: 'celestial-body',
+    pathMatch: 'full'
+  },
+  { 
+    path: 'celestial-body', 
+    component: CelestialBodyComponent 
+  },
+
 ];
 
 @NgModule({

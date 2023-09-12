@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { SceenService } from '../sceen/sceen.service';
+import { SceneService } from '../scene/scene.service';
 import { CameraService } from '../camera/camera.service';
+import { LightService } from '../light/light.service';
 import * as THREE from 'three';
 
 @Injectable({
@@ -9,61 +10,45 @@ import * as THREE from 'three';
 })
 export class ModelLoaderService {
 
+  scene: THREE.Scene;
+  camera: THREE.PerspectiveCamera;
+  light: THREE.DirectionalLight;
+  
   loader: GLTFLoader = new GLTFLoader();
-  private planetModel?: THREE.Group;
+  private model?: THREE.Group;
 
   constructor(
-    private scene: SceenService,
-    private cameraService: CameraService,
-  ) { }
-  loadPlanetOptimizate(callback: (planet: any) => void): void {
-    this.loader.load('../../../assets/glt_glb/callisto.glb', (gltf) => {
-      const planet = gltf.scene;
-      callback(planet);
 
-      this.planetModel?.scale.set(0.12, 0.115, 0.12);
-      //Cargar texturas y aplicarlas en angular
-      const loader = new THREE.TextureLoader();
-      const emissiveMap = loader.load('../../assets/img/ruido1.jpg');
-      const bumpMap = loader.load('../../assets/img/ruido2.jpg');
+  ) { 
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.light = new THREE.DirectionalLight(0xffffff, 1);
+  }
 
-      planet.traverse((child: any) => {
+  initialize(): void {
+    this.scene.add(this.light);
+    this.camera.position.z = 200;
+  }
+
+  loadModel(path: string, callback: (model: any) => void): void {
+    this.loader.load(path, (gltf) => {
+      const model = gltf.scene;
+      callback(model);
+
+      this.model?.scale.set(0.12, 0.115, 0.12);
+
+      model.traverse((child: any) => {
         if (child.isMesh) {
-          child.material.emissiveMap = emissiveMap; // Textura de puntos naranjas brillantes
-          child.material.emissive = new THREE.Color("#FFFFFF"); // Color blanco para aumentar la luminosidad
-          child.material.emissiveIntensity = 1.0;
-
-          child.material.bumpMap = bumpMap; // Textura de relieve para resaltar los puntos brillantes
-          child.material.bumpScale = 0.1; // Ajusta la intensidad del relieve según sea necesario
-
           child.material.needsUpdate = true;
         }
       });
 
-      this.scene.scene?.add(planet);
-      this.cameraService.camera?.lookAt(planet.position);
-      this.planetModel = planet;
+      this.scene.add(model);
+      this.camera.lookAt(model.position);
+      this.model = model;
 
-    });
+    }, undefined, (error) => console.error(error));
   }
 
-}
 
-//cargar texturas y alpicarlas en js
-/*
-    const loader = new THREE.TextureLoader();
-    const emissiveMap = loader.load('Proyect/src/assets/img/ruido1.jpg');
-    const bumpMap = loader.load('Proyect/src/assets/img/ruido2.jpg');
-      planetModel.traverse((child) => {
-        if (child.isMesh) {
-            child.material.emissiveMap = emissiveMap; // Textura de puntos naranjas brillantes
-            child.material.emissive = new THREE.Color("#FFFFFF"); // Color blanco para aumentar la luminosidad
-            child.material.emissiveIntensity = 1.0;
-            
-            child.material.bumpMap = bumpMap; // Textura de relieve para resaltar los puntos brillantes
-            child.material.bumpScale = 0.1; // Ajusta la intensidad del relieve según sea necesario
-            
-            child.material.needsUpdate = true;
-        }
-    });
-*/
+}
