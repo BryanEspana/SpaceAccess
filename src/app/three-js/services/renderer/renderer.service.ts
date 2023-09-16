@@ -5,13 +5,11 @@ import * as THREE from 'three';
   providedIn: 'root'
 })
 export class RendererService {
-renderer?: THREE.WebGLRenderer;
+renderer: THREE.WebGLRenderer;
 
-constructor() { 
-  this.renderer = new THREE.WebGLRenderer({antialias: true});
-  this.renderer.setSize( window.innerWidth, window.innerHeight );
-  document.body.appendChild( this.renderer.domElement );
-  
+constructor() {
+  this.renderer = new THREE.WebGLRenderer();
+  this.renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 }

@@ -5,9 +5,9 @@ import * as THREE from 'three';
   providedIn: 'root'
 })
 export class CameraService {
-  camera?: THREE.PerspectiveCamera;
+  camera: THREE.PerspectiveCamera;
 
-constructor() { 
+constructor() {
   this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
 }
